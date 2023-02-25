@@ -55,12 +55,15 @@ const allAddvert = async( req, res ) => {
 const findAddvert = async( req, res ) => {
     const id = req.params.id;
     try {
-        const result = await add.findById(id);
+        console.log(id);
+        const result = await add.find({custid: id});
         
         
         res.json( {
             success: true,
-            data:result
+            data:result,
+            
+            id : id
         })
     } catch (error) {
         
@@ -81,7 +84,8 @@ const updateAddvert = async( req, res ) => {
         const result = await add.findById(id);
         
         result.addid=addid;
-        result.addview=addview;
+        var num = Number(result.addview)+1;
+        result.addview=num.toString();
         result.addclik=addclik;
         result.custid=custid;
         result.save();

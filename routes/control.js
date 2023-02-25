@@ -7,11 +7,11 @@ router.post('/newAddvert/:Custid', newAddvert);
 
 router.get('/allAddvert', allAddvert); 
 
-router.get('/addvert/:id', findAddvert); 
+router.get('/custAddvert/:id', findAddvert); 
 
-router.put('/addvert/:id', updateAddvert); 
+router.put('/upaddvert/:id', updateAddvert); 
 
-router.delete('/addvert/:id', deleteAddvert); 
+router.delete('/deladdvert/:id', deleteAddvert); 
 
 
 
