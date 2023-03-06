@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const {newAddvert, allAddvert, findAddvert,
-       updateAddvertW, deleteAddvert } = require('../dbAccess/dbtrans')
+       updateAddvertW, deleteAddvert,updateAddvertC } = require('../dbAccess/dbtrans')
 
 router.post('/newAddvert/:Custid', newAddvert);
 
