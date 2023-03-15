@@ -33,7 +33,6 @@ const newAddvert =async (req, res ) => {
 }
 
 const allAddvert = async( req, res ) => {
-
     try {
         const result = await add.find();
         res.json( {
