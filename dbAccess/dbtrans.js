@@ -105,7 +105,7 @@ const updateAddvert = async( req, res ) => {
 }
 
 const deleteAddvert = async( req, res ) => {
-
+    //TODO
     res.json( {
         success: true,
         data: 'delete customer with id: ' + req.body.id
@@ -113,5 +113,27 @@ const deleteAddvert = async( req, res ) => {
 }
 
 
+const getRandomAddvert = async (req,res) => {
+    try{
+        var n = Math.floor((await add.count()) * Math.random());
+        
+        const result = await add.findOne().skip(n);
+        res.json({
+            success: true,
+            data:result,
+
+        })
+        return;
+    }catch(error) {
+        res.json( {
+            success: false,
+            data :"get add error",
+            error: error.message ,
+
+        })
+        return;
+    }
+}
+
 module.exports = { allAddvert, newAddvert, findAddvert,
-    updateAddvert, deleteAddvert  }; 
+    updateAddvert, deleteAddvert  ,getRandomAddvert}; 
