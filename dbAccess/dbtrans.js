@@ -76,7 +76,7 @@ const findAddvert = async( req, res ) => {
     }
 }
 
-const updateAddvert = async( req, res ) => {
+const updateAddvertW = async( req, res ) => {
     const{addid,addview,addclik,custid} =req.body;
     const id = req.params.id;
     try {
@@ -86,6 +86,33 @@ const updateAddvert = async( req, res ) => {
         var num = Number(result.addview)+1;
         result.addview=num.toString();
         result.addclik=addclik;
+        result.custid=custid;
+        result.save();
+        res.json( {
+            success: true,
+            data: result 
+        })
+    } catch (error) {
+        
+        console.log('update add error',error.message);
+        res.json( {
+            success: false,
+            data :"update add error",
+            error: error.message 
+        })
+    }
+    
+}
+const updateAddvertC = async( req, res ) => {
+    const{addid,addview,addclik,custid} =req.body;
+    const id = req.params.id;
+    try {
+        const result = await add.findById(id);
+        
+        result.addid=addid;
+        var num = Number(result.addclik)+1;
+        result.addclik=num.toString();
+        result.addview=addview;
         result.custid=custid;
         result.save();
         res.json( {
@@ -136,4 +163,7 @@ const getRandomAddvert = async (req,res) => {
 }
 
 module.exports = { allAddvert, newAddvert, findAddvert,
-    updateAddvert, deleteAddvert  ,getRandomAddvert}; 
+
+
+    updateAddvertW, deleteAddvert,updateAddvertC ,getRandomAddvert }; 
+

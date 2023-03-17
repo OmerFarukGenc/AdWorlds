@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const {newAddvert, allAddvert, findAddvert,
-       updateAddvert, deleteAddvert, getRandomAddvert } = require('../dbAccess/dbtrans')
+
+       updateAddvertW, deleteAddvert,updateAddvertC ,getRandomAddvert} = require('../dbAccess/dbtrans')
+
 
 router.post('/newAddvert/:Custid', newAddvert);
 
@@ -9,7 +11,9 @@ router.get('/allAddvert', allAddvert);
 
 router.get('/custAddvert/:id', findAddvert); 
 
-router.put('/upaddvert/:id', updateAddvert); 
+router.put('/upaddvertW/:id', updateAddvertW); 
+
+router.put('/upaddvertC/:id', updateAddvertC);
 
 router.delete('/deladdvert/:id', deleteAddvert); 
 
