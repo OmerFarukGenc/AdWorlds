@@ -3,7 +3,10 @@ const { default: mongoose } = require('mongoose');
 const app = express();
 const control = require('./routes/control');
 const userProcessor = require("./middleswares/userProcessor");
+const cors = require('cors')
 
+// for local environment to ease proxy.
+app.use(cors())
 
 require('dotenv').config();
 const dbconnect = async(DB_URL)=>{
@@ -20,9 +23,7 @@ const dbconnect = async(DB_URL)=>{
 };
 app.use( express.json());
 
-// routing control 
-
-
+// routing control
 app.use("/",userProcessor);
 
 app.use( '/api', control );
