@@ -162,8 +162,23 @@ const getRandomAddvert = async (req,res) => {
     }
 }
 
+const downloadAdd  = async (req,res) => {
+    try{
+        res.download("./out/example.prefab");
+        return;
+    }catch(error) {
+        res.json( {
+            success: false,
+            data :"get add error",
+            error: error.message ,
+
+        })
+        return;
+    }
+}
+
 module.exports = { allAddvert, newAddvert, findAddvert,
 
 
-    updateAddvertW, deleteAddvert,updateAddvertC ,getRandomAddvert }; 
+    updateAddvertW, deleteAddvert,updateAddvertC ,getRandomAddvert,downloadAdd }; 
 

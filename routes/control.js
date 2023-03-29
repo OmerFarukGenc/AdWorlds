@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {newAddvert, allAddvert, findAddvert,
 
-       updateAddvertW, deleteAddvert,updateAddvertC ,getRandomAddvert} = require('../dbAccess/dbtrans')
+       updateAddvertW, deleteAddvert,updateAddvertC ,getRandomAddvert,downloadAdd} = require('../dbAccess/dbtrans')
 
 
 router.post('/newAddvert/:Custid', newAddvert);
@@ -19,6 +19,7 @@ router.delete('/deladdvert/:id', deleteAddvert);
 
 router.get("/getRandomAddvert",getRandomAddvert);
 
+router.get("/downloadAdd",downloadAdd);
 
 
 
