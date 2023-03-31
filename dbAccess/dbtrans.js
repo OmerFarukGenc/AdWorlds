@@ -1,13 +1,15 @@
 const add = require('../model/addvert');
-
-
+const base64 = require('base64-js');
+const path = require('path');
+const fs = require('fs');
 const newAddvert =async (req, res ) => {
-    const{addid,addview,addclik,custid} = req.body;
+    const{addid,addview,addclik,custid,modeladd} = req.body;
     const addvert = new add({
         addid :addid,
         addview: addview,
         addclik:addclik,
-        custid:custid
+        custid:custid,
+        modeladd:modeladd
 
     })
     const id =req.params.Custid
@@ -141,13 +143,20 @@ const deleteAddvert = async( req, res ) => {
 
 
 const getRandomAddvert = async (req,res) => {
+    
     try{
         var n = Math.floor((await add.count()) * Math.random());
         
         const result = await add.findOne().skip(n);
+        const modeladd = result.modeladd;
+        const decodedBytes = base64.toByteArray(modeladd);
+        decodedFilePath = path.join(path.dirname("\out"), './out/decoded.prefab');
+        
+        fs.writeFileSync(decodedFilePath, decodedBytes);
         res.json({
             success: true,
-            data:result,
+            modeladd:result,
+            
 
         })
         return;
@@ -156,7 +165,6 @@ const getRandomAddvert = async (req,res) => {
             success: false,
             data :"get add error",
             error: error.message ,
-
         })
         return;
     }
@@ -164,7 +172,7 @@ const getRandomAddvert = async (req,res) => {
 
 const downloadAdd  = async (req,res) => {
     try{
-        res.download("./out/example.prefab");
+        res.download("./out/decoded.prefab");
         return;
     }catch(error) {
         res.json( {
