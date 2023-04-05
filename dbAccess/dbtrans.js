@@ -150,14 +150,22 @@ const getRandomAddvert = async (req,res) => {
         const result = await add.findOne().skip(n);
         const modeladd = result.modeladd;
         const decodedBytes = base64.toByteArray(modeladd);
+        
+
+        //res.send(decodedBytes);
+
         decodedFilePath = path.join(path.dirname("\out"), './out/decoded.prefab');
         
         fs.writeFileSync(decodedFilePath, decodedBytes);
-        res.json({
+        /*res.json({
             success: true,
             modeladd:result,
             
 
+        })*/
+        res.download(decodedFilePath, (err) => { 
+
+            fs.unlinkSync(decodedFilePath);
         })
         return;
     }catch(error) {
