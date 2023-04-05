@@ -154,7 +154,7 @@ const getRandomAddvert = async (req,res) => {
 
         //res.send(decodedBytes);
 
-        decodedFilePath = path.join(path.dirname("\out"), './out/decoded.prefab');
+        decodedFilePath = path.join(path.dirname("\out"), './out/outdecodedbundle');
         
         fs.writeFileSync(decodedFilePath, decodedBytes);
         /*res.json({
