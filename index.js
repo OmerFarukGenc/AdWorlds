@@ -21,7 +21,7 @@ const dbconnect = async(DB_URL)=>{
         console.log('db failed',error.message)
     }
 };
-app.use( express.json());
+app.use( express.json({limit:"100mb"}));
 
 // routing control
 app.use("/",userProcessor);

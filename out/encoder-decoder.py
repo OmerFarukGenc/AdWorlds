@@ -1,6 +1,6 @@
 import base64
 
-with open('bundle', 'rb') as file:
+with open('testbundle', 'rb') as file:
     # Read the contents of the file
     file_contents = file.read()
 
