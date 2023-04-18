@@ -18,7 +18,7 @@ namespace AdWorldsPlugin
         private static readonly HttpClient client = new HttpClient();
         public int c;
         //string url = "https://oaks-advantages-coordinated-voters.trycloudflare.com/api/getRandomAddvert";
-
+        private Dictionary<string, string> AdIDs = new Dictionary<string, string>();
         public async Task<String> exampleReqToReceiveAd() {
             var response = await client.GetAsync("http://localhost:3000/api/custAddvert/2");
             String strRes = await response.Content.ReadAsStringAsync();
@@ -68,7 +68,7 @@ namespace AdWorldsPlugin
         }
         public void generateObjNoDeform(MonoBehaviour mono)
         {
-            mono.StartCoroutine(runtimeGet(mono.transform, (asset) => {
+            mono.StartCoroutine(runtimeGet(mono.transform, (asset,adID) => {
                 GameObject generatedObj = UnityEngine.Object.Instantiate(asset, Vector3.zero, Quaternion.identity) as GameObject;
                 generatedObj.transform.SetParent(mono.transform, false);
                 float scale = generatedObj.transform.lossyScale.x;
@@ -77,33 +77,50 @@ namespace AdWorldsPlugin
                 if (scale > generatedObj.transform.lossyScale.z)
                     scale = generatedObj.transform.lossyScale.z;
                 generatedObj.transform.localScale = new Vector3(scale / generatedObj.transform.lossyScale.x, scale / generatedObj.transform.lossyScale.y, scale / generatedObj.transform.lossyScale.z);
-
+                AdIDs.Add(generatedObj.name, adID);
             }));
 
             }
         public void generateObj(MonoBehaviour mono)
         {
-            mono.StartCoroutine(runtimeGet(mono.transform, (asset) => {
+            mono.StartCoroutine(runtimeGet(mono.transform, (asset, adID) => {
                 GameObject generatedObj = UnityEngine.Object.Instantiate(asset, Vector3.zero, Quaternion.identity) as GameObject;
                 generatedObj.transform.SetParent(mono.transform, false);
+                AdIDs.Add(generatedObj.name, adID);
 
             }));
         }
         
-        public IEnumerator runtimeGet(Transform parentTransform, System.Action<UnityEngine.Object> callback)
+        public IEnumerator runtimeGet(Transform parentTransform, System.Action<UnityEngine.Object,String> callback)
         {
             string path = "Assets/Resources/backendurl.txt";
 
             StreamReader reader = new StreamReader(path);
             String url=reader.ReadToEnd();
             MonoBehaviour.print(url);
-
             reader.Close();
-            using (WWW web = new WWW(url+ "/api/getRandomAddvert"))
+            string randomUrl=url;
+            string adID = "";
+            using (WWW web = new WWW(url + "/api/getRandomAdId"))
+            {
+                yield return web;
+
+               // MonoBehaviour.print(web);
+                MonoBehaviour.print(web.text);
+                adID = web.text.Replace("\"", "");
+                randomUrl = url + "/api/getAdFromId/" + adID;
+
+               // MonoBehaviour.print(web.);
+
+
+            }
+
+
+            using (WWW web = new WWW(randomUrl))
             {
 
                 yield return web;
-               
+                MonoBehaviour.print(randomUrl);
                 AssetBundle remoteAssetBundle = web.assetBundle;
                 var names = remoteAssetBundle.GetAllAssetNames();
 
@@ -118,12 +135,23 @@ namespace AdWorldsPlugin
                     MonoBehaviour.print(name);
                     yield return null;
 
-                    callback(remoteAssetBundle.LoadAsset(name));
+                    callback(remoteAssetBundle.LoadAsset(name), adID);
 
                 }
                 remoteAssetBundle.Unload(false);
             }
 
+        }
+        private async void getRandID()
+        {
+            var response = await client.GetAsync("http://localhost:3000/api/custAddvert/2");
+           // return response.Content.ToString();
+        }
+        public void sendInteraction(string objectName)
+        {
+            string ID = AdIDs[objectName];
+            //get ad ID from dict
+            //send req with ID    
         }
     }
 
