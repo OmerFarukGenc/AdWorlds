@@ -6,19 +6,21 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using UnityEngine;
 using System.Xml.Linq;
-using Newtonsoft.Json;
+using System.Collections;
+
 namespace AdWorldsPlugin
 {
     public class AdWorlds
     {
         private static readonly HttpClient client = new HttpClient();
         public int c;
+        string url = "https://oaks-advantages-coordinated-voters.trycloudflare.com/api/getRandomAddvert";
+
         public async Task<String> exampleReqToReceiveAd() {
             var response = await client.GetAsync("http://localhost:3000/api/custAddvert/2");
             String strRes = await response.Content.ReadAsStringAsync();
-            dynamic json = JsonConvert.DeserializeObject(strRes);
-            MonoBehaviour.print(json["data"][0]["addid"]);
-            return json["data"][0]["addid"];
+            
+            return "test";
         }
         public async Task<GameObject> receiveRandAdAsync()
         {
@@ -79,5 +81,43 @@ namespace AdWorldsPlugin
             var responseString = await response.Content.ReadAsStringAsync();
             return responseString != null;//or any response validation
         }
+        public IEnumerator runtimeGet(Transform parentTransform)
+        {
+            using (WWW web = new WWW(url))
+            {
+
+                yield return web;
+                MonoBehaviour.print("asd");
+
+                AssetBundle remoteAssetBundle = web.assetBundle;
+                var names = remoteAssetBundle.GetAllAssetNames();
+
+                foreach (string name in names)
+                {
+                    MonoBehaviour.print(name);
+
+                }
+                if (remoteAssetBundle == null)
+                {
+                    Debug.LogError("Failed to download AssetBundle!");
+                    yield break;
+                }
+                MonoBehaviour.print(names);
+
+                foreach (string name in names)
+                {
+                    MonoBehaviour.print(name+"adasa");
+
+                    GameObject myBrick = UnityEngine.Object.Instantiate(remoteAssetBundle.LoadAsset(name), Vector3.zero, Quaternion.identity) as GameObject;
+                    myBrick.transform.SetParent(parentTransform.transform, false);
+                    MonoBehaviour.print(myBrick.gameObject.name);
+
+
+                }
+                remoteAssetBundle.Unload(false);
+            }
+
+        }
     }
+
 }
