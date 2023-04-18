@@ -6,19 +6,24 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using UnityEngine;
 using System.Xml.Linq;
-using Newtonsoft.Json;
+using System.Collections;
+using System.IO;
+using Microsoft.Cci;
+using UnityEngine.Networking;
+
 namespace AdWorldsPlugin
 {
     public class AdWorlds
     {
         private static readonly HttpClient client = new HttpClient();
         public int c;
+        //string url = "https://oaks-advantages-coordinated-voters.trycloudflare.com/api/getRandomAddvert";
+
         public async Task<String> exampleReqToReceiveAd() {
             var response = await client.GetAsync("http://localhost:3000/api/custAddvert/2");
             String strRes = await response.Content.ReadAsStringAsync();
-            dynamic json = JsonConvert.DeserializeObject(strRes);
-            MonoBehaviour.print(json["data"][0]["addid"]);
-            return json["data"][0]["addid"];
+            
+            return "test";
         }
         public async Task<GameObject> receiveRandAdAsync()
         {
@@ -33,24 +38,6 @@ namespace AdWorldsPlugin
         private GameObject loadObj()
         {
             return Resources.Load("example") as GameObject; 
-        }
-        public void generateObjNoDeform(Transform parentTransform)
-        {
-            GameObject child = loadObj();
-            GameObject generatedObj = UnityEngine.Object.Instantiate(child, Vector3.zero, Quaternion.identity) as GameObject;
-            generatedObj.transform.SetParent(parentTransform.transform, false);
-            float scale = generatedObj.transform.lossyScale.x;
-            if (scale > generatedObj.transform.lossyScale.y)
-                scale = generatedObj.transform.lossyScale.y;
-            if (scale > generatedObj.transform.lossyScale.z)
-                scale = generatedObj.transform.lossyScale.z;
-            generatedObj.transform.localScale = new Vector3(scale / generatedObj.transform.lossyScale.x, scale / generatedObj.transform.lossyScale.y, scale / generatedObj.transform.lossyScale.z);
-        }
-        public void generateObj(Transform parentTransform)
-        {
-            GameObject child = loadObj();//change with received gameobject from backend
-            GameObject myBrick = UnityEngine.Object.Instantiate(child, Vector3.zero, Quaternion.identity) as GameObject;
-            myBrick.transform.SetParent(parentTransform.transform, false);
         }
         public async Task<GameObject> receiveSpecificAdAsync(String id)
         {
@@ -79,5 +66,65 @@ namespace AdWorldsPlugin
             var responseString = await response.Content.ReadAsStringAsync();
             return responseString != null;//or any response validation
         }
+        public void generateObjNoDeform(MonoBehaviour mono)
+        {
+            mono.StartCoroutine(runtimeGet(mono.transform, (asset) => {
+                GameObject generatedObj = UnityEngine.Object.Instantiate(asset, Vector3.zero, Quaternion.identity) as GameObject;
+                generatedObj.transform.SetParent(mono.transform, false);
+                float scale = generatedObj.transform.lossyScale.x;
+                if (scale > generatedObj.transform.lossyScale.y)
+                    scale = generatedObj.transform.lossyScale.y;
+                if (scale > generatedObj.transform.lossyScale.z)
+                    scale = generatedObj.transform.lossyScale.z;
+                generatedObj.transform.localScale = new Vector3(scale / generatedObj.transform.lossyScale.x, scale / generatedObj.transform.lossyScale.y, scale / generatedObj.transform.lossyScale.z);
+
+            }));
+
+            }
+        public void generateObj(MonoBehaviour mono)
+        {
+            mono.StartCoroutine(runtimeGet(mono.transform, (asset) => {
+                GameObject generatedObj = UnityEngine.Object.Instantiate(asset, Vector3.zero, Quaternion.identity) as GameObject;
+                generatedObj.transform.SetParent(mono.transform, false);
+
+            }));
+        }
+        
+        public IEnumerator runtimeGet(Transform parentTransform, System.Action<UnityEngine.Object> callback)
+        {
+            string path = "Assets/Resources/backendurl.txt";
+
+            StreamReader reader = new StreamReader(path);
+            String url=reader.ReadToEnd();
+            MonoBehaviour.print(url);
+
+            reader.Close();
+            using (WWW web = new WWW(url+ "/api/getRandomAddvert"))
+            {
+
+                yield return web;
+               
+                AssetBundle remoteAssetBundle = web.assetBundle;
+                var names = remoteAssetBundle.GetAllAssetNames();
+
+                if (remoteAssetBundle == null)
+                {
+                    Debug.LogError("Failed to download AssetBundle!");
+                    yield break;
+                }
+
+                foreach (string name in names)
+                {
+                    MonoBehaviour.print(name);
+                    yield return null;
+
+                    callback(remoteAssetBundle.LoadAsset(name));
+
+                }
+                remoteAssetBundle.Unload(false);
+            }
+
+        }
     }
+
 }
