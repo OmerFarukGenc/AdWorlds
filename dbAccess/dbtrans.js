@@ -141,40 +141,65 @@ const deleteAddvert = async( req, res ) => {
     })
 }
 
-
-const getRandomAddvert = async (req,res) => {
-    
+const getRandomAdId = async (req, res) => {
     try{
-        var n = Math.floor((await add.count()) * Math.random());
-        
+        const n = Math.floor((await add.count()) * Math.random());
         const result = await add.findOne().skip(n);
-        const modeladd = result.modeladd;
-        const decodedBytes = base64.toByteArray(modeladd);
-        
-
-        //res.send(decodedBytes);
-
-        decodedFilePath = path.join(path.dirname("\out"), './out/outdecodedbundle');
-        
-        fs.writeFileSync(decodedFilePath, decodedBytes);
-        /*res.json({
-            success: true,
-            modeladd:result,
-            
-
-        })*/
-        res.download(decodedFilePath, (err) => { 
-
-            fs.unlinkSync(decodedFilePath);
-        })
-        return;
+        res.json(result.addid)
     }catch(error) {
         res.json( {
             success: false,
             data :"get add error",
             error: error.message ,
         })
-        return;
+    }
+}
+
+const getAdFromId = async (req,res) => {
+    try{
+        var adId = req.params.id;
+        const result = await add.findOne({ addid: adId })
+        const modeladd = result.modeladd;
+        const decodedBytes = base64.toByteArray(modeladd);
+
+        const decodedFilePath = path.join(path.dirname("\out"), './out/outdecodedbundle');
+
+        fs.writeFileSync(decodedFilePath, decodedBytes);
+        res.download(decodedFilePath, (err) => {
+
+            fs.unlinkSync(decodedFilePath);
+        })
+    }catch(error) {
+        res.json( {
+            success: false,
+            data :"get add error",
+            error: error.message ,
+        })
+    }
+}
+
+const getRandomAddvert = async (req,res) => {
+
+    try{
+        var n = Math.floor((await add.count()) * Math.random());
+
+        const result = await add.findOne().skip(n);
+        const modeladd = result.modeladd;
+        const decodedBytes = base64.toByteArray(modeladd);
+        
+        const decodedFilePath = path.join(path.dirname("\out"), './out/outdecodedbundle');
+
+        fs.writeFileSync(decodedFilePath, decodedBytes);
+        res.download(decodedFilePath, (err) => {
+
+            fs.unlinkSync(decodedFilePath);
+        })
+    }catch(error) {
+        res.json( {
+            success: false,
+            data :"get add error",
+            error: error.message ,
+        })
     }
 }
 
@@ -196,5 +221,5 @@ const downloadAdd  = async (req,res) => {
 module.exports = { allAddvert, newAddvert, findAddvert,
 
 
-    updateAddvertW, deleteAddvert,updateAddvertC ,getRandomAddvert,downloadAdd }; 
+    updateAddvertW, deleteAddvert,updateAddvertC ,getRandomAddvert,downloadAdd, getRandomAdId, getAdFromId };
 
