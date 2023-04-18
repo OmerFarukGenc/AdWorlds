@@ -7,6 +7,7 @@ using System.Net.Http;
 using UnityEngine;
 using System.Xml.Linq;
 using System.Collections;
+using System.IO;
 
 namespace AdWorldsPlugin
 {
@@ -14,7 +15,7 @@ namespace AdWorldsPlugin
     {
         private static readonly HttpClient client = new HttpClient();
         public int c;
-        string url = "https://oaks-advantages-coordinated-voters.trycloudflare.com/api/getRandomAddvert";
+        //string url = "https://oaks-advantages-coordinated-voters.trycloudflare.com/api/getRandomAddvert";
 
         public async Task<String> exampleReqToReceiveAd() {
             var response = await client.GetAsync("http://localhost:3000/api/custAddvert/2");
@@ -83,7 +84,15 @@ namespace AdWorldsPlugin
         }
         public IEnumerator runtimeGet(Transform parentTransform)
         {
-            using (WWW web = new WWW(url))
+            string path = "Assets/Resources/be.txt";
+
+            StreamReader reader = new StreamReader(path);
+            String url=reader.ReadToEnd();
+            MonoBehaviour.print(url);
+            MonoBehaviour.print(url + "/api/getRandomAddvert");
+
+            reader.Close();
+            using (WWW web = new WWW(url+ "/api/getRandomAddvert"))
             {
 
                 yield return web;
