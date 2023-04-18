@@ -8,6 +8,8 @@ using UnityEngine;
 using System.Xml.Linq;
 using System.Collections;
 using System.IO;
+using Microsoft.Cci;
+using UnityEngine.Networking;
 
 namespace AdWorldsPlugin
 {
@@ -37,24 +39,6 @@ namespace AdWorldsPlugin
         {
             return Resources.Load("example") as GameObject; 
         }
-        public void generateObjNoDeform(Transform parentTransform)
-        {
-            GameObject child = loadObj();
-            GameObject generatedObj = UnityEngine.Object.Instantiate(child, Vector3.zero, Quaternion.identity) as GameObject;
-            generatedObj.transform.SetParent(parentTransform.transform, false);
-            float scale = generatedObj.transform.lossyScale.x;
-            if (scale > generatedObj.transform.lossyScale.y)
-                scale = generatedObj.transform.lossyScale.y;
-            if (scale > generatedObj.transform.lossyScale.z)
-                scale = generatedObj.transform.lossyScale.z;
-            generatedObj.transform.localScale = new Vector3(scale / generatedObj.transform.lossyScale.x, scale / generatedObj.transform.lossyScale.y, scale / generatedObj.transform.lossyScale.z);
-        }
-        public void generateObj(Transform parentTransform)
-        {
-            GameObject child = loadObj();//change with received gameobject from backend
-            GameObject myBrick = UnityEngine.Object.Instantiate(child, Vector3.zero, Quaternion.identity) as GameObject;
-            myBrick.transform.SetParent(parentTransform.transform, false);
-        }
         public async Task<GameObject> receiveSpecificAdAsync(String id)
         {
             var responseBytes = await client.GetByteArrayAsync("http://www.example.com" + id);
@@ -82,45 +66,59 @@ namespace AdWorldsPlugin
             var responseString = await response.Content.ReadAsStringAsync();
             return responseString != null;//or any response validation
         }
-        public IEnumerator runtimeGet(Transform parentTransform)
+        public void generateObjNoDeform(MonoBehaviour mono)
         {
-            string path = "Assets/Resources/be.txt";
+            mono.StartCoroutine(runtimeGet(mono.transform, (asset) => {
+                GameObject generatedObj = UnityEngine.Object.Instantiate(asset, Vector3.zero, Quaternion.identity) as GameObject;
+                generatedObj.transform.SetParent(mono.transform, false);
+                float scale = generatedObj.transform.lossyScale.x;
+                if (scale > generatedObj.transform.lossyScale.y)
+                    scale = generatedObj.transform.lossyScale.y;
+                if (scale > generatedObj.transform.lossyScale.z)
+                    scale = generatedObj.transform.lossyScale.z;
+                generatedObj.transform.localScale = new Vector3(scale / generatedObj.transform.lossyScale.x, scale / generatedObj.transform.lossyScale.y, scale / generatedObj.transform.lossyScale.z);
+
+            }));
+
+            }
+        public void generateObj(MonoBehaviour mono)
+        {
+            mono.StartCoroutine(runtimeGet(mono.transform, (asset) => {
+                GameObject generatedObj = UnityEngine.Object.Instantiate(asset, Vector3.zero, Quaternion.identity) as GameObject;
+                generatedObj.transform.SetParent(mono.transform, false);
+
+            }));
+        }
+        
+        public IEnumerator runtimeGet(Transform parentTransform, System.Action<UnityEngine.Object> callback)
+        {
+            string path = "Assets/Resources/backendurl.txt";
 
             StreamReader reader = new StreamReader(path);
             String url=reader.ReadToEnd();
             MonoBehaviour.print(url);
-            MonoBehaviour.print(url + "/api/getRandomAddvert");
 
             reader.Close();
             using (WWW web = new WWW(url+ "/api/getRandomAddvert"))
             {
 
                 yield return web;
-                MonoBehaviour.print("asd");
-
+               
                 AssetBundle remoteAssetBundle = web.assetBundle;
                 var names = remoteAssetBundle.GetAllAssetNames();
 
-                foreach (string name in names)
-                {
-                    MonoBehaviour.print(name);
-
-                }
                 if (remoteAssetBundle == null)
                 {
                     Debug.LogError("Failed to download AssetBundle!");
                     yield break;
                 }
-                MonoBehaviour.print(names);
 
                 foreach (string name in names)
                 {
-                    MonoBehaviour.print(name+"adasa");
+                    MonoBehaviour.print(name);
+                    yield return null;
 
-                    GameObject myBrick = UnityEngine.Object.Instantiate(remoteAssetBundle.LoadAsset(name), Vector3.zero, Quaternion.identity) as GameObject;
-                    myBrick.transform.SetParent(parentTransform.transform, false);
-                    MonoBehaviour.print(myBrick.gameObject.name);
-
+                    callback(remoteAssetBundle.LoadAsset(name));
 
                 }
                 remoteAssetBundle.Unload(false);
