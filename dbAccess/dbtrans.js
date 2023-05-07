@@ -177,7 +177,7 @@ const getAdFromId = async (req,res) => {
         fs.writeFileSync(decodedFilePath, decodedBytes);
         res.download(decodedFilePath, (err) => {
 
-            fs.unlinkSync(decodedFilePath);
+            //fs.unlinkSync(decodedFilePath);
         })
     }catch(error) {
         res.json( {
@@ -202,7 +202,7 @@ const getRandomAddvert = async (req,res) => {
         fs.writeFileSync(decodedFilePath, decodedBytes);
         res.download(decodedFilePath, (err) => {
 
-            fs.unlinkSync(decodedFilePath);
+            //fs.unlinkSync(decodedFilePath);
         })
     }catch(error) {
         res.json( {
