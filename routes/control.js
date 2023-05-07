@@ -28,7 +28,10 @@ router.get("/getAdFromId/:id", getAdFromId);
 
 
 
+router.get("/downloadTest",(req,res) => {
 
+       res.download("assets/model.txt");
+})
 
 
 
