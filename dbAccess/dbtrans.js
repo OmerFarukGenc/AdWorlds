@@ -122,7 +122,7 @@ const updateAddvertC = async( req, res ) => {
             });
         }
 
-        addvert.addview = (parseInt(addvert.addview) + 1).toString();
+        addvert.addview = addvert.addview;
         addvert.addclik = (parseInt(addvert.addclik) + 1).toString();
 
         const result = await addvert.save();
@@ -170,14 +170,18 @@ const getAdFromId = async (req,res) => {
         var adId = req.params.id;
         const result = await add.findOne({ addid: adId })
         const modeladd = result.modeladd;
+        result.addview = (parseInt(result.addview) + 1).toString();
         const decodedBytes = base64.toByteArray(modeladd);
 
         const decodedFilePath = path.join(path.dirname("\out"), './out/outdecodedbundle');
 
         fs.writeFileSync(decodedFilePath, decodedBytes);
-        res.download(decodedFilePath, (err) => {
+        
+        const result_save = await result.save();
+        
+        await res.download(decodedFilePath, (err) => {
 
-            //fs.unlinkSync(decodedFilePath);
+            fs.unlinkSync(decodedFilePath);
         })
     }catch(error) {
         res.json( {
