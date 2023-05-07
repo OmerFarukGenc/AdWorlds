@@ -57,7 +57,7 @@ const findAddvert = async( req, res ) => {
     const id = req.params.id;
     try {
         console.log(id);
-        const result = await add.find({custid: id});
+        const result = await add.find({addid: id});
         
         
         res.json( {
@@ -79,56 +79,66 @@ const findAddvert = async( req, res ) => {
 }
 
 const updateAddvertW = async( req, res ) => {
-    const{addid,addview,addclik,custid} =req.body;
     const id = req.params.id;
+
     try {
-        const result = await add.findById(id);
-        
-        result.addid=addid;
-        var num = Number(result.addview)+1;
-        result.addview=num.toString();
-        result.addclik=addclik;
-        result.custid=custid;
-        result.save();
-        res.json( {
+        const addvert = await add.findOne({addid: id});
+
+        if (!addvert) {
+            return res.json({
+                success: false,
+                message: `No add found with addid: ${id}`
+            });
+        }
+
+        addvert.addview = (parseInt(addvert.addview) + 1).toString();
+
+        const result = await addvert.save();
+
+        res.json({
             success: true,
-            data: result 
-        })
+            message: `Add with addid ${id} has been updated`,
+            data: result
+        });
     } catch (error) {
-        
-        console.log('update add error',error.message);
-        res.json( {
+        console.log('update add error', error.message);
+        res.json({
             success: false,
-            data :"update add error",
-            error: error.message 
-        })
+            message: 'Failed to update add',
+            error: error.message
+        });
     }
-    
 }
 const updateAddvertC = async( req, res ) => {
-    const{addid,addview,addclik,custid} =req.body;
     const id = req.params.id;
+
     try {
-        const result = await add.findById(id);
-        
-        result.addid=addid;
-        var num = Number(result.addclik)+1;
-        result.addclik=num.toString();
-        result.addview=addview;
-        result.custid=custid;
-        result.save();
-        res.json( {
+        const addvert = await add.findOne({addid: id});
+
+        if (!addvert) {
+            return res.json({
+                success: false,
+                message: `No add found with addid: ${id}`
+            });
+        }
+
+        addvert.addview = (parseInt(addvert.addview) + 1).toString();
+        addvert.addclik = (parseInt(addvert.addclik) + 1).toString();
+
+        const result = await addvert.save();
+
+        res.json({
             success: true,
-            data: result 
-        })
+            message: `Add with addid ${id} has been updated`,
+            data: result
+        });
     } catch (error) {
-        
-        console.log('update add error',error.message);
-        res.json( {
+        console.log('update add error', error.message);
+        res.json({
             success: false,
-            data :"update add error",
-            error: error.message 
-        })
+            message: 'Failed to update add',
+            error: error.message
+        });
     }
     
 }
@@ -141,40 +151,65 @@ const deleteAddvert = async( req, res ) => {
     })
 }
 
-
-const getRandomAddvert = async (req,res) => {
-    
+const getRandomAdId = async (req, res) => {
     try{
-        var n = Math.floor((await add.count()) * Math.random());
-        
+        const n = Math.floor((await add.count()) * Math.random());
         const result = await add.findOne().skip(n);
-        const modeladd = result.modeladd;
-        const decodedBytes = base64.toByteArray(modeladd);
-        
-
-        //res.send(decodedBytes);
-
-        decodedFilePath = path.join(path.dirname("\out"), './out/outdecodedbundle');
-        
-        fs.writeFileSync(decodedFilePath, decodedBytes);
-        /*res.json({
-            success: true,
-            modeladd:result,
-            
-
-        })*/
-        res.download(decodedFilePath, (err) => { 
-
-            //fs.unlinkSync(decodedFilePath);
-        })
-        return;
+        res.json(result.addid)
     }catch(error) {
         res.json( {
             success: false,
             data :"get add error",
             error: error.message ,
         })
-        return;
+    }
+}
+
+const getAdFromId = async (req,res) => {
+    try{
+        var adId = req.params.id;
+        const result = await add.findOne({ addid: adId })
+        const modeladd = result.modeladd;
+        const decodedBytes = base64.toByteArray(modeladd);
+
+        const decodedFilePath = path.join(path.dirname("\out"), './out/outdecodedbundle');
+
+        fs.writeFileSync(decodedFilePath, decodedBytes);
+        res.download(decodedFilePath, (err) => {
+
+            //fs.unlinkSync(decodedFilePath);
+        })
+    }catch(error) {
+        res.json( {
+            success: false,
+            data :"get add error",
+            error: error.message ,
+        })
+    }
+}
+
+const getRandomAddvert = async (req,res) => {
+
+    try{
+        var n = Math.floor((await add.count()) * Math.random());
+
+        const result = await add.findOne().skip(n);
+        const modeladd = result.modeladd;
+        const decodedBytes = base64.toByteArray(modeladd);
+        
+        const decodedFilePath = path.join(path.dirname("\out"), './out/outdecodedbundle');
+
+        fs.writeFileSync(decodedFilePath, decodedBytes);
+        res.download(decodedFilePath, (err) => {
+
+            //fs.unlinkSync(decodedFilePath);
+        })
+    }catch(error) {
+        res.json( {
+            success: false,
+            data :"get add error",
+            error: error.message ,
+        })
     }
 }
 
@@ -196,5 +231,5 @@ const downloadAdd  = async (req,res) => {
 module.exports = { allAddvert, newAddvert, findAddvert,
 
 
-    updateAddvertW, deleteAddvert,updateAddvertC ,getRandomAddvert,downloadAdd }; 
+    updateAddvertW, deleteAddvert,updateAddvertC ,getRandomAddvert,downloadAdd, getRandomAdId, getAdFromId };
 
