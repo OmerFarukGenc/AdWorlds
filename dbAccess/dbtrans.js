@@ -165,7 +165,7 @@ const getRandomAddvert = async (req,res) => {
         })*/
         res.download(decodedFilePath, (err) => { 
 
-            fs.unlinkSync(decodedFilePath);
+            //fs.unlinkSync(decodedFilePath);
         })
         return;
     }catch(error) {
