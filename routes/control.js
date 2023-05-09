@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {newAddvert, allAddvert, findAddvert,
 
-       updateAddvertW, deleteAddvert,updateAddvertC ,getRandomAddvert,downloadAdd, getRandomAdId, getAdFromId
+       updateAddvertW, deleteAddvert,updateAddvertC ,getRandomAddvert,downloadAdd, getRandomAdId, getAdFromId,getNewId
 } = require('../dbAccess/dbtrans')
 
 
@@ -15,6 +15,9 @@ router.get('/custAddvert/:id', findAddvert);
 router.put('/upaddvertW/:id', updateAddvertW); 
 
 router.put('/upaddvertC/:id', updateAddvertC);
+
+
+router.get("/getNewId",getNewId);
 
 router.delete('/deladdvert/:id', deleteAddvert); 
 

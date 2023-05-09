@@ -57,7 +57,7 @@ const findAddvert = async( req, res ) => {
     const id = req.params.id;
     try {
         console.log(id);
-        const result = await add.find({addid: id});
+        const result = await add.find({custid: id});
         
         
         res.json( {
@@ -150,6 +150,22 @@ const deleteAddvert = async( req, res ) => {
         data: 'delete customer with id: ' + req.body.id
     })
 }
+const getNewId = async( req, res ) => {
+    //TODO
+    let value3 = 4;
+    let result = await add.findOne({ custid: value3 });
+
+    while(result != null){
+        value3 = Math.floor(Math.random() * 1000000000); 
+        result = await add.findOne({ custid: value3 });             
+    }
+    res.json( {
+        success: true,
+        result,
+        value3,
+        data: 'delete customer with id: ' + req.body.id
+    })
+}
 
 const getRandomAdId = async (req, res) => {
     try{
@@ -235,5 +251,5 @@ const downloadAdd  = async (req,res) => {
 module.exports = { allAddvert, newAddvert, findAddvert,
 
 
-    updateAddvertW, deleteAddvert,updateAddvertC ,getRandomAddvert,downloadAdd, getRandomAdId, getAdFromId };
+    updateAddvertW, deleteAddvert,updateAddvertC ,getRandomAddvert,downloadAdd, getRandomAdId, getAdFromId,getNewId };
 
