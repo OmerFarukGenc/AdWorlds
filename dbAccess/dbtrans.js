@@ -197,7 +197,10 @@ const getAdFromId = async (req,res) => {
         
         await res.download(decodedFilePath, (err) => {
 
-            fs.unlinkSync(decodedFilePath);
+            //fs.unlinkSync(decodedFilePath);
+            fs.unlink(decodedFilePath,(err) => {
+                console.log(err);
+            })
         })
     }catch(error) {
         res.json( {
